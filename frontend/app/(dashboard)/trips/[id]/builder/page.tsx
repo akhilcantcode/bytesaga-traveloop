@@ -15,24 +15,28 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import CitySearch from '@/components/activities/CitySearch'
 
 import { useStops, useCreateStop } from '@/hooks/useStops'
 import { useActivities, useCreateActivity } from '@/hooks/useActivities'
 
 function AddStopDialog({ tripId }: { tripId: string }) {
   const [open, setOpen] = useState(false)
+  const [selectedCity, setSelectedCity] = useState<{ city_name: string; country: string } | null>(null)
   const createStop = useCreateStop(tripId)
-  
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (!selectedCity) return
     const formData = new FormData(e.currentTarget)
     await createStop.mutateAsync({
-      city_name: formData.get('city_name') as string,
-      country: formData.get('country') as string,
+      city_name: selectedCity.city_name,
+      country: selectedCity.country,
       start_date: formData.get('start_date') as string,
       end_date: formData.get('end_date') as string,
       order_index: 0
     })
+    setSelectedCity(null)
     setOpen(false)
   }
 
@@ -45,16 +49,21 @@ function AddStopDialog({ tripId }: { tripId: string }) {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add a Stop</DialogTitle>
-          <DialogDescription>Add a new destination to your itinerary.</DialogDescription>
+          <DialogDescription>Search and select a destination to add to your itinerary.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="city_name">City Name</Label>
-            <Input id="city_name" name="city_name" required placeholder="e.g. Kyoto" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="country">Country</Label>
-            <Input id="country" name="country" required placeholder="e.g. Japan" />
+            <Label>City</Label>
+            <CitySearch
+              onSelect={(city) => setSelectedCity(city)}
+              placeholder="Search cities (e.g. Goa, Paris, Tokyo)"
+            />
+            {selectedCity && (
+              <p className="text-xs text-green-600 flex items-center gap-1">
+                <MapPin className="w-3 h-3" />
+                Selected: {selectedCity.city_name}, {selectedCity.country}
+              </p>
+            )}
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -68,7 +77,7 @@ function AddStopDialog({ tripId }: { tripId: string }) {
           </div>
           <div className="flex justify-end gap-3 pt-4">
             <Button variant="outline" type="button" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button type="submit" disabled={createStop.isPending}>
+            <Button type="submit" disabled={createStop.isPending || !selectedCity}>
               {createStop.isPending ? 'Adding...' : 'Add Stop'}
             </Button>
           </div>

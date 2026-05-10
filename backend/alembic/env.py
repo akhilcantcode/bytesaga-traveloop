@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from core.config import settings
 from models.base import Base
-from models import user, trip, stop, activity, expense, note, packing_item  # noqa: F401 — needed for autogenerate
+from models import user, trip, stop, activity, expense, note, packing_item, city  # noqa: F401 — needed for autogenerate
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)

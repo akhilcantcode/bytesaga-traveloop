@@ -110,6 +110,8 @@ git pull origin main
 cd backend
 # Make sure virtual environment is activated
 alembic upgrade head
+# Seed the city database (only needed once)
+python seed_cities.py
 ```
 
 If they want the `demo@traveloop.com` user to have admin privileges locally, they can just re-run the seed script:

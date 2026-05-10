@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from routers import auth, trips, stops, activities, expenses, notes, packing, public, admin
+from routers import auth, trips, stops, activities, expenses, notes, packing, public, admin, cities
 
 
 @asynccontextmanager
@@ -30,6 +30,7 @@ app.include_router(notes.router, prefix="/api/v1")
 app.include_router(packing.router, prefix="/api/v1")
 app.include_router(public.router, prefix="/api/v1")
 app.include_router(admin.router, prefix="/api/v1")
+app.include_router(cities.router, prefix="/api/v1")
 
 
 @app.get("/health")
