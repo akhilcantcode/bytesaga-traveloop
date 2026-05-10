@@ -1,7 +1,9 @@
 'use client'
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/authStore';
 
 const slides = [
   {
@@ -68,6 +70,12 @@ export default function TraveloopApp() {
   const current = slides[index];
   const next = (n: number) => setIndex((i) => (i + n + total) % total);
   const cards = [1, 2, 3].map((o) => slides[(index + o) % total]);
+  const router = useRouter();
+  const token = useAuthStore((s) => s.token);
+
+  useEffect(() => {
+    if (token) router.replace('/dashboard');
+  }, [token, router]);
 
   return (
     <div style={{ minHeight: "100vh", width: "100%", fontFamily: "system-ui, sans-serif", color: "white" }}>

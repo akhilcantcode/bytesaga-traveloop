@@ -11,39 +11,42 @@ export default function SignupPage() {
   const router = useRouter()
   const login = useAuthStore((s) => s.login)
   
-  // New UI fields
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [city, setCity] = useState('')
   const [country, setCountry] = useState('')
-  const [info, setInfo] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
     setError('')
-    
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.')
+      return
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.')
+      return
+    }
+    setIsLoading(true)
     try {
-      // Use a default password to satisfy the backend, since the UI design requested 
-      // doesn't have a password field. In a real app, we would add the password field.
-      const defaultPassword = "password123"
-      
       // 1. Register
       await api.post('/auth/register', {
         email,
-        password: defaultPassword,
+        password,
         full_name: `${firstName} ${lastName}`.trim() || 'New User'
       })
 
       // 2. Login
       const { data: tokenData } = await api.post('/auth/login', new URLSearchParams({
         username: email,
-        password: defaultPassword,
+        password,
       }), {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
       })
@@ -168,20 +171,38 @@ export default function SignupPage() {
                 className="w-full h-10 px-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/20 focus:border-[#0ea5e9] transition-all text-[14px] placeholder:text-gray-400"
               />
             </div>
-          </div>
-          
-          {/* Additional Information */}
-          <div className="space-y-1 mt-1">
-            <label className="text-[12px] font-semibold text-[#4a5568] px-1" htmlFor="info">
-              Additional Information
-            </label>
-            <textarea 
-              id="info" 
-              placeholder="Tell us a bit more..."
-              value={info}
-              onChange={(e) => setInfo(e.target.value)}
-              className="w-full h-16 p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/20 focus:border-[#0ea5e9] transition-all text-[13px] placeholder:text-gray-400 resize-none"
-            />
+          {/* Password */}
+            <div className="space-y-1.5">
+              <label className="text-[13px] font-semibold text-[#4a5568] px-1" htmlFor="password">
+                Password
+              </label>
+              <input 
+                id="password" 
+                type="password" 
+                placeholder="Min. 8 characters" 
+                required
+                minLength={8}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full h-10 px-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/20 focus:border-[#0ea5e9] transition-all text-[14px] placeholder:text-gray-400"
+              />
+            </div>
+
+            {/* Confirm Password */}
+            <div className="space-y-1.5">
+              <label className="text-[13px] font-semibold text-[#4a5568] px-1" htmlFor="confirmPassword">
+                Confirm Password
+              </label>
+              <input 
+                id="confirmPassword" 
+                type="password" 
+                placeholder="Repeat password" 
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full h-10 px-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/20 focus:border-[#0ea5e9] transition-all text-[14px] placeholder:text-gray-400"
+              />
+            </div>
           </div>
           
           <div className="pt-2">
