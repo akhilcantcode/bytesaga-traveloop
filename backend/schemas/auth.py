@@ -32,5 +32,6 @@ class UserRead(BaseModel):
     email: str
     full_name: str
     avatar_url: Optional[str] = None
+    is_admin: bool
     created_at: datetime
     updated_at: datetime

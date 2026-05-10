@@ -100,3 +100,19 @@ Before you begin, ensure you have the following installed on your machine:
 - Ensure you have the backend API running simultaneously with the frontend development server.
 - The `PLANNING.md` at the root contains the data models and MVP feature list.
 - Use the `.agents` folder for reference on coding conventions for this specific project.
+
+### Pulling Latest Database Changes
+
+When new database columns (like the `is_admin` flag) or tables are added by other collaborators, your friends will need to update their local databases. Have them run:
+
+```bash
+git pull origin main
+cd backend
+# Make sure virtual environment is activated
+alembic upgrade head
+```
+
+If they want the `demo@traveloop.com` user to have admin privileges locally, they can just re-run the seed script:
+```bash
+python seed.py
+```

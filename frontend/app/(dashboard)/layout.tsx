@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/store/authStore'
 import Navbar from '@/components/layout/Navbar'
@@ -8,12 +8,17 @@ import Navbar from '@/components/layout/Navbar'
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const token = useAuthStore((s) => s.token)
+  const [isHydrated, setIsHydrated] = useState(false)
 
   useEffect(() => {
-    if (!token) router.replace('/login')
-  }, [token, router])
+    setIsHydrated(true)
+  }, [])
 
-  if (!token) return null
+  useEffect(() => {
+    if (isHydrated && !token) router.replace('/login')
+  }, [token, isHydrated, router])
+
+  if (!isHydrated || !token) return null
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -19,6 +19,11 @@ export default function Navbar() {
               <Link href="/trips" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                 My Trips
               </Link>
+              {user?.is_admin && (
+                <Link href="/admin" className="border-transparent text-purple-600 hover:border-purple-300 hover:text-purple-800 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                  Admin Panel
+                </Link>
+              )}
             </div>
           </div>
           <div className="flex items-center space-x-4">

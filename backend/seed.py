@@ -24,6 +24,7 @@ async def seed():
             email="demo@traveloop.com",
             password_hash=hash_password("demo1234"),
             full_name="Alex Rivera",
+            is_admin=True,
         )
         db.add(user)
         await db.flush()

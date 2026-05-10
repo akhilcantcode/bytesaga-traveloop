@@ -16,6 +16,7 @@ class User(TimestampMixin, Base):
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     full_name: Mapped[str] = mapped_column(String(255), nullable=False)
     avatar_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    is_admin: Mapped[bool] = mapped_column(default=False, server_default="false")
 
     trips: Mapped[list["Trip"]] = relationship(
         "Trip", back_populates="user", cascade="all, delete-orphan"
