@@ -1,14 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from routers import auth, trips, stops, activities, expenses, notes, packing, public, admin, cities
-
+from routers import auth, trips, stops, activities, expenses, notes, packing, public, admin, cities, dashboard
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Tables are managed by Alembic
     yield
-
 
 app = FastAPI(title="Traveloop API", version="1.0.0", lifespan=lifespan)
 
@@ -31,6 +29,7 @@ app.include_router(packing.router, prefix="/api/v1")
 app.include_router(public.router, prefix="/api/v1")
 app.include_router(admin.router, prefix="/api/v1")
 app.include_router(cities.router, prefix="/api/v1")
+app.include_router(dashboard.router, prefix="/api/v1")
 
 
 @app.get("/health")

@@ -22,3 +22,23 @@ async def search_cities(
     stmt = stmt.order_by(City.popularity.desc()).limit(20)
     result = await db.execute(stmt)
     return result.scalars().all()
+
+
+@router.get("/{city_id}", response_model=CityRead)
+async def get_city(
+    city_id: str,
+    db: AsyncSession = Depends(get_db),
+):
+    import uuid
+    from fastapi import HTTPException
+    try:
+        parsed_id = uuid.UUID(city_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid city ID format")
+
+    stmt = select(City).where(City.id == parsed_id)
+    result = await db.execute(stmt)
+    city = result.scalar_one_or_none()
+    if not city:
+        raise HTTPException(status_code=404, detail="City not found")
+    return city

@@ -4,10 +4,10 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuthStore } from '@/store/authStore'
 import { Button } from '@/components/ui/button'
-import { 
-  LayoutDashboard, 
-  Map, 
-  User, 
+import {
+  LayoutDashboard,
+  Map,
+  User,
   LogOut,
   ShieldAlert,
   Compass,
@@ -23,7 +23,7 @@ export default function Sidebar() {
     { href: '/', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/trips', label: 'My Trips', icon: Map },
     { href: '/explore', label: 'Explore', icon: Compass },
-    { href: '/budget', label: 'Budget', icon: Wallet },
+    // { href: '/budget', label: 'Budget', icon: Wallet },
   ]
 
   return (
@@ -41,17 +41,17 @@ export default function Sidebar() {
         <div className="mb-4 px-2 text-[10px] font-bold text-sky-600/70 uppercase tracking-widest">
           Menu
         </div>
-        
+
         {navItems.map((item) => {
           const Icon = item.icon
           const isActive = pathname === item.href
-          
+
           return (
             <Link key={item.href} href={item.href}>
               <div className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 group mb-1.5 relative overflow-hidden",
-                isActive 
-                  ? "bg-white/80 text-sky-700 shadow-sm ring-1 ring-white/50" 
+                isActive
+                  ? "bg-white/80 text-sky-700 shadow-sm ring-1 ring-white/50"
                   : "text-gray-600 hover:bg-white/50 hover:text-sky-900"
               )}>
                 {isActive && (
@@ -91,7 +91,7 @@ export default function Sidebar() {
       </div>
 
       <div className="p-4 border-t border-white/50 bg-white/20">
-        <div className="flex items-center gap-3 mb-4 px-3 py-2 bg-white/60 rounded-2xl shadow-sm ring-1 ring-white/50 backdrop-blur-sm cursor-pointer hover:bg-white/80 transition-colors" onClick={() => window.location.href='/profile'}>
+        <div className="flex items-center gap-3 mb-4 px-3 py-2 bg-white/60 rounded-2xl shadow-sm ring-1 ring-white/50 backdrop-blur-sm cursor-pointer hover:bg-white/80 transition-colors" onClick={() => window.location.href = '/profile'}>
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center font-bold text-sm shadow-inner">
             {user?.full_name?.charAt(0)?.toUpperCase() || 'U'}
           </div>
@@ -104,9 +104,9 @@ export default function Sidebar() {
             </p>
           </div>
         </div>
-        
-        <Button 
-          variant="ghost" 
+
+        <Button
+          variant="ghost"
           className="w-full justify-start text-gray-500 hover:text-red-600 hover:bg-red-50/50 rounded-xl transition-colors"
           onClick={() => logout()}
         >
