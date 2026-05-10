@@ -1,11 +1,68 @@
 'use client'
 
-import { use } from 'react'
+import { use, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Plus, StickyNote } from 'lucide-react'
+import { Label } from '@/components/ui/label'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 
-import { useNotes } from '@/hooks/useNotes'
+import { useNotes, useCreateNote } from '@/hooks/useNotes'
+
+function AddNoteDialog({ tripId }: { tripId: string }) {
+  const [open, setOpen] = useState(false)
+  const createNote = useCreateNote(tripId)
+  
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    await createNote.mutateAsync({
+      content: formData.get('content') as string,
+    })
+    setOpen(false)
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger render={<Button className="gap-2" />}>
+        <Plus className="w-4 h-4" />
+        New Note
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>New Note</DialogTitle>
+          <DialogDescription>Jot down ideas, links, or reminders.</DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="content">Note Content</Label>
+            <textarea 
+              id="content" 
+              name="content" 
+              required 
+              rows={5}
+              placeholder="Start typing..."
+              className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            />
+          </div>
+          <div className="flex justify-end gap-3 pt-4">
+            <Button variant="outline" type="button" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button type="submit" disabled={createNote.isPending}>
+              {createNote.isPending ? 'Saving...' : 'Save Note'}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
 
 export default function TripNotesPage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
@@ -19,10 +76,7 @@ export default function TripNotesPage(props: { params: Promise<{ id: string }> }
           <h1 className="text-2xl font-bold tracking-tight">Trip Notes</h1>
           <p className="text-gray-500">Keep track of important details, links, and ideas.</p>
         </div>
-        <Button className="gap-2">
-          <Plus className="w-4 h-4" />
-          New Note
-        </Button>
+        <AddNoteDialog tripId={params.id} />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

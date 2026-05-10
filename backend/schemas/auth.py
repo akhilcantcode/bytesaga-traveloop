@@ -20,6 +20,11 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
 
 
+class UserUpdate(BaseModel):
+    full_name: Optional[str] = None
+
+
+
 class UserRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

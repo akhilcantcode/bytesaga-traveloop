@@ -22,7 +22,9 @@ export default function Navbar() {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-500">{user?.full_name}</span>
+            <Link href="/profile" className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors">
+              {user?.full_name}
+            </Link>
             <Button variant="outline" size="sm" onClick={() => logout()}>
               Log out
             </Button>

@@ -24,6 +24,18 @@ export function useTrip(id: string) {
   })
 }
 
+export function usePublicTrip(id: string) {
+  return useQuery<any>({
+    queryKey: ['public', 'trips', id],
+    queryFn: async () => {
+      const { data } = await api.get(`/public/trips/${id}`)
+      return data
+    },
+    enabled: !!id,
+    retry: 1, // Don't retry too much if it's 404/not public
+  })
+}
+
 export function useTripBudget(id: string) {
   return useQuery<BudgetSummary>({
     queryKey: QUERY_KEYS.trips.budget(id),

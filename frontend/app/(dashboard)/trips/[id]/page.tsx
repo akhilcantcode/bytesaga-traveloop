@@ -1,18 +1,33 @@
 'use client'
 
-import { use } from 'react'
+import { use, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Calendar, MapPin, Navigation } from 'lucide-react'
+import { Calendar, MapPin, Navigation, Share2, Globe, Lock, Copy, Check } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 
-import { useTrip } from '@/hooks/useTrips'
+import { useTrip, useUpdateTrip } from '@/hooks/useTrips'
 import { useStops } from '@/hooks/useStops'
 
 export default function TripOverviewPage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
   const { data: trip, isLoading: isTripLoading } = useTrip(params.id)
   const { data: stops, isLoading: isStopsLoading } = useStops(params.id)
+  const updateTrip = useUpdateTrip()
+  const [copied, setCopied] = useState(false)
+
+  const togglePublic = () => {
+    if (!trip) return
+    updateTrip.mutate({ id: trip.id, is_public: !trip.is_public })
+  }
+
+  const copyPublicLink = () => {
+    const url = `${window.location.origin}/share/${params.id}`
+    navigator.clipboard.writeText(url)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   if (isTripLoading || isStopsLoading) return <div className="p-8 text-center">Loading trip details...</div>
   if (!trip) return <div className="p-8 text-center text-red-500">Trip not found.</div>
@@ -77,18 +92,42 @@ export default function TripOverviewPage(props: { params: Promise<{ id: string }
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Quick Links</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Share2 className="w-5 h-5 text-indigo-500" />
+                Share Trip
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center gap-3 text-sm">
-                <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
-                  <MapPin className="w-4 h-4" />
+              <div className="flex items-center justify-between p-3 border rounded-lg bg-gray-50/50">
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-full ${trip?.is_public ? 'bg-green-100 text-green-600' : 'bg-gray-200 text-gray-500'}`}>
+                    {trip?.is_public ? <Globe className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+                  </div>
+                  <div>
+                    <p className="font-medium text-sm">{trip?.is_public ? 'Public' : 'Private'}</p>
+                    <p className="text-xs text-gray-500">
+                      {trip?.is_public ? 'Anyone with the link can view' : 'Only you can view'}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-medium">Map View</p>
-                  <p className="text-gray-500">Coming soon</p>
-                </div>
+                <Button 
+                  variant={trip?.is_public ? "default" : "outline"} 
+                  size="sm"
+                  onClick={togglePublic}
+                  disabled={updateTrip.isPending}
+                >
+                  {trip?.is_public ? 'Make Private' : 'Make Public'}
+                </Button>
               </div>
+
+              {trip?.is_public && (
+                <div className="pt-2">
+                  <Button variant="secondary" className="w-full gap-2" onClick={copyPublicLink}>
+                    {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
+                    {copied ? 'Copied!' : 'Copy Public Link'}
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

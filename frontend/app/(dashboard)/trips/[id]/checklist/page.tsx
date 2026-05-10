@@ -6,8 +6,69 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Plus, Check, Circle } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Label } from '@/components/ui/label'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 
-import { usePackingList, useTogglePackingItem } from '@/hooks/usePacking'
+import { usePackingList, useTogglePackingItem, useCreatePackingItem } from '@/hooks/usePacking'
+
+function AddPackingItemDialog({ tripId }: { tripId: string }) {
+  const [open, setOpen] = useState(false)
+  const createItem = useCreatePackingItem(tripId)
+  
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    await createItem.mutateAsync({
+      label: formData.get('label') as string,
+      category: formData.get('category') as any,
+    })
+    setOpen(false)
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger render={<Button className="gap-2" />}>
+        <Plus className="w-4 h-4" />
+        Add Item
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add Packing Item</DialogTitle>
+          <DialogDescription>What do you need to bring?</DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="label">Item Name</Label>
+            <Input id="label" name="label" required placeholder="e.g. Passport" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="category">Category</Label>
+            <select id="category" name="category" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" required>
+              <option value="documents">Documents</option>
+              <option value="clothing">Clothing</option>
+              <option value="electronics">Electronics</option>
+              <option value="toiletries">Toiletries</option>
+              <option value="misc">Miscellaneous</option>
+            </select>
+          </div>
+          <div className="flex justify-end gap-3 pt-4">
+            <Button variant="outline" type="button" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button type="submit" disabled={createItem.isPending}>
+              {createItem.isPending ? 'Adding...' : 'Add Item'}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
 
 export default function PackingChecklistPage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params)
@@ -33,10 +94,7 @@ export default function PackingChecklistPage(props: { params: Promise<{ id: stri
             {totalCount ? Math.round((packedCount / totalCount) * 100) : 0}%)
           </p>
         </div>
-        <Button className="gap-2">
-          <Plus className="w-4 h-4" />
-          Add Item
-        </Button>
+        <AddPackingItemDialog tripId={params.id} />
       </div>
 
       <Card>
